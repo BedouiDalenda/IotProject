@@ -6,9 +6,9 @@ import json
 # ============ CONFIGURATION ============
 BROKER = "localhost"  # Ton broker Mosquitto local
 PORT = 1883
-TOPIC = "ecg/data"
-CSV_FILE = "ecg_data.csv"  # Chemin vers ton fichier CSV
-DELAY = 0.01  # Délai entre chaque envoi (en secondes) - simule le temps réel
+TOPIC = "medical/vitals"  # Topic pour les signes vitaux
+CSV_FILE = "medical_data.csv"  # Nom de ton fichier CSV
+DELAY = 0.1  # Délai entre chaque envoi (100ms pour simulation temps réel)
 
 # ============ CONNEXION MQTT ============
 def on_connect(client, userdata, flags, rc):
@@ -27,42 +27,47 @@ except Exception as e:
     print(f"❌ Erreur de connexion au broker: {e}")
     exit(1)
 
-# ============ LECTURE ET PUBLICATION DU CSV ============
+# ============ LECTURE DU CSV ============
 try:
-    # Lire le fichier CSV
     print(f"📄 Lecture du fichier: {CSV_FILE}")
-    df = pd.read_csv(CSV_FILE)
-    
+    df = pd.read_csv(CSV_FILE, encoding='utf-8-sig')
+    df.columns = df.columns.str.strip()
     print(f"📊 {len(df)} lignes trouvées")
     print(f"📡 Colonnes disponibles: {list(df.columns)}")
-    print(f"🚀 Début de l'envoi des données...\n")
-    
-    # Parcourir chaque ligne du CSV
-    for index, row in df.iterrows():
-        # Créer le message JSON
-        message = {
-            "timestamp": str(row.get('timestamp', index)),  # Utilise index si pas de colonne timestamp
-            "ecg_value": float(row.iloc[1]) if len(row) > 1 else float(row.iloc[0])  # Prend la 2ème colonne ou la 1ère
-        }
-        
-        # Publier sur MQTT
-        result = client.publish(TOPIC, json.dumps(message))
-        
-        if result.rc == mqtt.MQTT_ERR_SUCCESS:
-            print(f"✅ Envoyé [{index+1}/{len(df)}]: {message}")
-        else:
-            print(f"❌ Erreur d'envoi: {result.rc}")
-        
-        # Attendre avant d'envoyer la prochaine valeur (simulation temps réel)
-        time.sleep(DELAY)
-    
-    print("\n🎉 Tous les messages ont été envoyés!")
-
 except FileNotFoundError:
     print(f"❌ Fichier introuvable: {CSV_FILE}")
-    print("💡 Assure-toi que le fichier CSV est dans le même dossier que ce script")
+    exit(1)
 except Exception as e:
-    print(f"❌ Erreur: {e}")
+    print(f"❌ Erreur lors de la lecture du CSV: {e}")
+    exit(1)
+
+# ============ SIMULATION CONTINUE ============
+print("🚀 Simulation d'envoi de données en continu...")
+
+try:
+    while True:
+        for index, row in df.iterrows():
+            message = {
+                "timestamp": str(row['timestamp']),
+                "heart_rate": int(row['heart_rate']),
+                "systolic_bp": int(row['systolic_bp']),
+                "diastolic_bp": int(row['diastolic_bp']),
+                "oxygen_sat": int(row['oxygen_sat']),
+                "temperature": float(row['temperature'])
+            }
+
+            result = client.publish(TOPIC, json.dumps(message))
+
+            if result.rc == mqtt.MQTT_ERR_SUCCESS:
+                print(f"✅ Envoyé [{index+1}/{len(df)}]: HR={message['heart_rate']} BP={message['systolic_bp']}/{message['diastolic_bp']} O2={message['oxygen_sat']}% T={message['temperature']}°C")
+            else:
+                print(f"❌ Erreur d'envoi: {result.rc}")
+
+            time.sleep(DELAY)
+
+        # Boucle infinie : recommence le CSV depuis le début
+except KeyboardInterrupt:
+    print("\n🛑 Simulation interrompue par l'utilisateur")
 finally:
     client.loop_stop()
     client.disconnect()

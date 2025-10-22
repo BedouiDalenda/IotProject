@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECG Monitor - Temps Réel</title>
+    <title>Medical Monitor - Surveillance & Alertes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
         * {
@@ -14,53 +14,125 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             padding: 20px;
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 30px;
-            max-width: 1200px;
-            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 10px;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
             font-size: 2.5em;
-            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .status-bar {
+        /* ALERTES PANEL */
+        .alerts-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .alerts-header {
             display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
         }
 
-        .status-item {
-            text-align: center;
+        .alerts-header h2 {
+            color: #333;
+            font-size: 1.5em;
         }
 
-        .status-label {
-            font-size: 0.9em;
+        .alert-counter {
+            background: #ef4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .alert-item {
+            background: #fee;
+            border-left: 4px solid #ef4444;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-item.warning {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .alert-item.info {
+            background: #e0f2fe;
+            border-left-color: #0ea5e9;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-timestamp {
+            font-size: 0.85em;
             color: #666;
             margin-bottom: 5px;
         }
 
-        .status-value {
-            font-size: 1.5em;
-            font-weight: bold;
+        .alert-message {
+            font-weight: 600;
             color: #333;
+            margin-bottom: 5px;
+        }
+
+        .alert-details {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .no-alerts {
+            text-align: center;
+            color: #10b981;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+
+        /* STATUS BAR */
+        .status-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .status-item {
+            text-align: center;
         }
 
         .status-indicator {
@@ -86,15 +158,86 @@
             50% { opacity: 0.5; }
         }
 
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 20px 0;
-            background: #1a1a2e;
-            border-radius: 15px;
-            padding: 20px;
+        /* VITAL CARDS */
+        .vital-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
+        .vital-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .vital-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .vital-card.alert {
+            border: 3px solid #ef4444;
+            animation: borderPulse 1s infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { border-color: #ef4444; }
+            50% { border-color: #fca5a5; }
+        }
+
+        .vital-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .vital-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .vital-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .vital-unit {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        /* CHARTS */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .chart-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        /* CONTROLS */
         .controls {
             display: flex;
             justify-content: center;
@@ -113,14 +256,14 @@
         }
 
         button.primary {
-            background: #667eea;
+            background: #10b981;
             color: white;
         }
 
         button.primary:hover {
-            background: #5568d3;
+            background: #059669;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
         }
 
         button.secondary {
@@ -132,125 +275,257 @@
             background: #d1d5db;
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 0.9em;
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            .status-bar {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📊 ECG Monitor - Temps Réel</h1>
+        <h1>🏥 Medical Monitor - Surveillance & Alertes en Temps Réel</h1>
         
+        <!-- PANEL D'ALERTES -->
+        <div class="alerts-panel">
+            <div class="alerts-header">
+                <h2>🚨 Alertes Actives</h2>
+                <span class="alert-counter" id="alertCounter">0</span>
+            </div>
+            <div id="alertsList">
+                <div class="no-alerts">✅ Aucune alerte - Tous les signes vitaux sont normaux</div>
+            </div>
+        </div>
+
+        <!-- BARRE DE STATUS -->
         <div class="status-bar">
             <div class="status-item">
-                <div class="status-label">
-                    <span class="status-indicator disconnected" id="connectionIndicator"></span>
-                    Connexion
+                <span class="status-indicator disconnected" id="connectionIndicator"></span>
+                <span id="connectionStatus">Déconnecté</span>
+            </div>
+            <div class="status-item">
+                📊 Vitals: <strong id="vitalsCount">0</strong>
+            </div>
+            <div class="status-item">
+                🚨 Alertes: <strong id="totalAlerts">0</strong>
+            </div>
+            <div class="status-item">
+                🕐 <strong id="timestamp">--</strong>
+            </div>
+        </div>
+
+        <!-- CARTES DES SIGNES VITAUX -->
+        <div class="vital-cards">
+            <div class="vital-card" id="cardHeartRate">
+                <div class="vital-icon">❤️</div>
+                <div class="vital-label">Fréquence Cardiaque</div>
+                <div class="vital-value" id="heartRate">--</div>
+                <div class="vital-unit">BPM</div>
+            </div>
+            <div class="vital-card" id="cardBloodPressure">
+                <div class="vital-icon">💉</div>
+                <div class="vital-label">Pression Artérielle</div>
+                <div class="vital-value" id="bloodPressure">--/--</div>
+                <div class="vital-unit">mmHg</div>
+            </div>
+            <div class="vital-card" id="cardOxygen">
+                <div class="vital-icon">🫁</div>
+                <div class="vital-label">Saturation O₂</div>
+                <div class="vital-value" id="oxygenSat">--</div>
+                <div class="vital-unit">%</div>
+            </div>
+            <div class="vital-card" id="cardTemperature">
+                <div class="vital-icon">🌡️</div>
+                <div class="vital-label">Température</div>
+                <div class="vital-value" id="temperature">--</div>
+                <div class="vital-unit">°C</div>
+            </div>
+        </div>
+
+        <!-- GRAPHIQUES -->
+        <div class="charts-container">
+            <div class="chart-box">
+                <h3>📈 Fréquence Cardiaque</h3>
+                <div class="chart-wrapper">
+                    <canvas id="heartRateChart"></canvas>
                 </div>
-                <div class="status-value" id="connectionStatus">Déconnecté</div>
             </div>
-            <div class="status-item">
-                <div class="status-label">Valeur Actuelle</div>
-                <div class="status-value" id="currentValue">--</div>
+            <div class="chart-box">
+                <h3>💉 Pression Artérielle</h3>
+                <div class="chart-wrapper">
+                    <canvas id="bloodPressureChart"></canvas>
+                </div>
             </div>
-            <div class="status-item">
-                <div class="status-label">Messages Reçus</div>
-                <div class="status-value" id="messageCount">0</div>
+            <div class="chart-box">
+                <h3>🫁 Saturation en Oxygène</h3>
+                <div class="chart-wrapper">
+                    <canvas id="oxygenChart"></canvas>
+                </div>
             </div>
-            <div class="status-item">
-                <div class="status-label">BPM Estimé</div>
-                <div class="status-value" id="bpmValue">--</div>
+            <div class="chart-box">
+                <h3>🌡️ Température Corporelle</h3>
+                <div class="chart-wrapper">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="chart-container">
-            <canvas id="ecgChart"></canvas>
-        </div>
-
+        <!-- CONTROLES -->
         <div class="controls">
             <button class="primary" id="connectBtn" onclick="connect()">🔌 Connecter</button>
             <button class="secondary" id="pauseBtn" onclick="togglePause()" disabled>⏸️ Pause</button>
-            <button class="secondary" onclick="clearChart()">🗑️ Effacer</button>
-        </div>
-
-        <div class="footer">
-            💡 Assurez-vous que le microservice est en cours d'exécution sur le port 8080
+            <button class="secondary" onclick="clearAll()">🗑️ Tout Effacer</button>
         </div>
     </div>
 
     <script>
-        // Configuration
         const WS_URL = 'ws://localhost:3000';
-        const MAX_DATA_POINTS = 100;
+        const MAX_DATA_POINTS = 50;
+        const MAX_ALERTS = 20;
 
-        // Variables globales
         let ws = null;
-        let chart = null;
         let isPaused = false;
-        let messageCount = 0;
-        let ecgData = [];
-        let timestamps = [];
+        let vitalsCount = 0;
+        let totalAlerts = 0;
+        let activeAlerts = [];
+        let charts = {};
+        let data = {
+            timestamps: [],
+            heartRate: [],
+            systolic: [],
+            diastolic: [],
+            oxygenSat: [],
+            temperature: []
+        };
 
-        // Initialiser le graphique
-        function initChart() {
-            const ctx = document.getElementById('ecgChart').getContext('2d');
-            chart = new Chart(ctx, {
+        // Mapping des vitals vers les cards
+        const vitalCardMap = {
+            'heart_rate': 'cardHeartRate',
+            'systolic_bp': 'cardBloodPressure',
+            'diastolic_bp': 'cardBloodPressure',
+            'oxygen_sat': 'cardOxygen',
+            'temperature': 'cardTemperature'
+        };
+
+        // Fonction pour obtenir la date et heure actuelles formatées
+        function getCurrentDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const time = now.toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            return `${date} ${time}`;
+        }
+
+        // Mettre à jour l'heure actuelle périodiquement
+        function updateCurrentTime() {
+            document.getElementById('timestamp').textContent = getCurrentDateTime();
+        }
+
+        function initCharts() {
+            charts.heartRate = new Chart(document.getElementById('heartRateChart'), {
                 type: 'line',
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Signal ECG',
+                        label: 'BPM',
+                        data: [],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: getChartOptions()
+            });
+
+            charts.bloodPressure = new Chart(document.getElementById('bloodPressureChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Systolique',
+                            data: [],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Diastolique',
+                            data: [],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: getChartOptions()
+            });
+
+            charts.oxygen = new Chart(document.getElementById('oxygenChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'O₂ %',
                         data: [],
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 2,
                         tension: 0.4,
-                        pointRadius: 0,
                         fill: true
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        x: {
-                            display: false
-                        },
-                        y: {
-                            grid: {
-                                color: '#2d2d44'
-                            },
-                            ticks: {
-                                color: '#10b981'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#10b981',
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        }
-                    }
-                }
+                options: getChartOptions()
+            });
+
+            charts.temperature = new Chart(document.getElementById('temperatureChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '°C',
+                        data: [],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: getChartOptions()
             });
         }
 
-        // Connexion WebSocket
-        function connect() {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                console.log('Déjà connecté');
-                return;
-            }
+        function getChartOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    x: { display: false },
+                    y: { beginAtZero: false }
+                },
+                plugins: {
+                    legend: { display: true }
+                }
+            };
+        }
 
-            console.log('Connexion au WebSocket...');
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+
             ws = new WebSocket(WS_URL);
 
             ws.onopen = () => {
@@ -265,47 +540,179 @@
                 if (isPaused) return;
 
                 try {
-                    const data = JSON.parse(event.data);
-                    addDataPoint(data);
-                    messageCount++;
-                    document.getElementById('messageCount').textContent = messageCount;
-                    document.getElementById('currentValue').textContent = data.ecg_value.toFixed(2);
+                    const message = JSON.parse(event.data);
+                    
+                    if (message.type === 'vitals') {
+                        updateVitalsDisplay(message.data);
+                        vitalsCount++;
+                        document.getElementById('vitalsCount').textContent = vitalsCount;
+                    } 
+                    else if (message.type === 'alert') {
+                        handleAlert(message.data);
+                        totalAlerts++;
+                        document.getElementById('totalAlerts').textContent = totalAlerts;
+                    }
                 } catch (error) {
-                    console.error('Erreur de parsing:', error);
+                    console.error('Erreur:', error);
                 }
             };
 
-            ws.onerror = (error) => {
-                console.error('❌ Erreur WebSocket:', error);
-            };
-
             ws.onclose = () => {
-                console.log('👋 Déconnecté du WebSocket');
+                console.log('👋 Déconnecté');
                 updateConnectionStatus(false);
                 document.getElementById('connectBtn').textContent = '🔌 Reconnecter';
                 document.getElementById('connectBtn').disabled = false;
                 document.getElementById('pauseBtn').disabled = true;
             };
+
+            ws.onerror = (error) => {
+                console.error('❌ Erreur WebSocket:', error);
+            };
         }
 
-        // Ajouter un point de données
-        function addDataPoint(data) {
-            ecgData.push(data.ecg_value);
-            timestamps.push(data.timestamp);
+        function updateVitalsDisplay(vitals) {
+            // Mise à jour des cartes
+            document.getElementById('heartRate').textContent = vitals.heart_rate;
+            document.getElementById('bloodPressure').textContent = 
+                `${vitals.systolic_bp}/${vitals.diastolic_bp}`;
+            document.getElementById('oxygenSat').textContent = vitals.oxygen_sat;
+            document.getElementById('temperature').textContent = vitals.temperature;
+            
+            // Utiliser l'heure actuelle au lieu de celle reçue du serveur
+            document.getElementById('timestamp').textContent = getCurrentDateTime();
 
-            // Garder seulement les derniers points
-            if (ecgData.length > MAX_DATA_POINTS) {
-                ecgData.shift();
-                timestamps.shift();
+            // Mise à jour des données pour les graphiques
+            const currentTime = getCurrentDateTime();
+            data.timestamps.push(currentTime);
+            data.heartRate.push(vitals.heart_rate);
+            data.systolic.push(vitals.systolic_bp);
+            data.diastolic.push(vitals.diastolic_bp);
+            data.oxygenSat.push(vitals.oxygen_sat);
+            data.temperature.push(vitals.temperature);
+
+            // Garder seulement les N derniers points
+            if (data.timestamps.length > MAX_DATA_POINTS) {
+                data.timestamps.shift();
+                data.heartRate.shift();
+                data.systolic.shift();
+                data.diastolic.shift();
+                data.oxygenSat.shift();
+                data.temperature.shift();
             }
 
-            // Mettre à jour le graphique
-            chart.data.labels = timestamps;
-            chart.data.datasets[0].data = ecgData;
-            chart.update('none'); // 'none' pour désactiver l'animation
+            // Mise à jour des graphiques
+            updateChart(charts.heartRate, [data.heartRate]);
+            updateChart(charts.bloodPressure, [data.systolic, data.diastolic]);
+            updateChart(charts.oxygen, [data.oxygenSat]);
+            updateChart(charts.temperature, [data.temperature]);
         }
 
-        // Mettre à jour le statut de connexion
+        function handleAlert(alertData) {
+            console.log('🚨 Alerte reçue:', alertData);
+            
+            // Ajouter les nouvelles alertes
+            alertData.alerts.forEach(alert => {
+                activeAlerts.unshift({
+                    timestamp: getCurrentDateTime(), // Utiliser l'heure actuelle
+                    ...alert
+                });
+            });
+
+            // Limiter le nombre d'alertes affichées
+            if (activeAlerts.length > MAX_ALERTS) {
+                activeAlerts = activeAlerts.slice(0, MAX_ALERTS);
+            }
+
+            // Mettre à jour l'affichage
+            updateAlertsDisplay();
+            
+            // Mettre en évidence les cartes concernées
+            highlightAffectedCards(alertData.alerts);
+            
+            // Son d'alerte (optionnel)
+            playAlertSound();
+        }
+
+        function updateAlertsDisplay() {
+            const alertsList = document.getElementById('alertsList');
+            const alertCounter = document.getElementById('alertCounter');
+            
+            alertCounter.textContent = activeAlerts.length;
+
+            if (activeAlerts.length === 0) {
+                alertsList.innerHTML = '<div class="no-alerts">✅ Aucune alerte - Tous les signes vitaux sont normaux</div>';
+                return;
+            }
+
+            let html = '';
+            activeAlerts.forEach((alert, index) => {
+                const alertClass = alert.level === 'CRITIQUE' ? 'alert-item' : 'alert-item warning';
+                const icon = alert.level === 'CRITIQUE' ? '🔴' : '🟡';
+                
+                html += `
+                    <div class="${alertClass}">
+                        <div class="alert-timestamp">${icon} ${alert.timestamp}</div>
+                        <div class="alert-message">${alert.message}</div>
+                        <div class="alert-details">
+                            Valeur: ${alert.value} ${alert.unit} | 
+                            Seuil ${alert.type === 'max' ? 'max' : 'min'}: ${alert.threshold} ${alert.unit}
+                        </div>
+                    </div>
+                `;
+            });
+
+            alertsList.innerHTML = html;
+        }
+
+        function highlightAffectedCards(alerts) {
+            // Retirer toutes les alertes précédentes
+            Object.values(vitalCardMap).forEach(cardId => {
+                document.getElementById(cardId).classList.remove('alert');
+            });
+
+            // Ajouter les nouvelles alertes
+            alerts.forEach(alert => {
+                const cardId = vitalCardMap[alert.vital];
+                if (cardId) {
+                    document.getElementById(cardId).classList.add('alert');
+                }
+            });
+
+            // Retirer l'alerte après 5 secondes
+            setTimeout(() => {
+                Object.values(vitalCardMap).forEach(cardId => {
+                    document.getElementById(cardId).classList.remove('alert');
+                });
+            }, 5000);
+        }
+
+        function playAlertSound() {
+            // Créer un son d'alerte simple (optionnel)
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function updateChart(chart, datasets) {
+            chart.data.labels = data.timestamps;
+            datasets.forEach((dataset, i) => {
+                chart.data.datasets[i].data = dataset;
+            });
+            chart.update('none');
+        }
+
         function updateConnectionStatus(connected) {
             const indicator = document.getElementById('connectionIndicator');
             const status = document.getElementById('connectionStatus');
@@ -321,29 +728,69 @@
             }
         }
 
-        // Pause/Reprendre
         function togglePause() {
             isPaused = !isPaused;
-            const btn = document.getElementById('pauseBtn');
-            btn.textContent = isPaused ? '▶️ Reprendre' : '⏸️ Pause';
+            document.getElementById('pauseBtn').textContent = 
+                isPaused ? '▶️ Reprendre' : '⏸️ Pause';
         }
 
-        // Effacer le graphique
-        function clearChart() {
-            ecgData = [];
-            timestamps = [];
-            messageCount = 0;
-            chart.data.labels = [];
-            chart.data.datasets[0].data = [];
-            chart.update();
-            document.getElementById('messageCount').textContent = '0';
-            document.getElementById('currentValue').textContent = '--';
+        function clearAll() {
+            // Réinitialiser les données
+            data = {
+                timestamps: [],
+                heartRate: [],
+                systolic: [],
+                diastolic: [],
+                oxygenSat: [],
+                temperature: []
+            };
+            
+            // Réinitialiser les compteurs
+            vitalsCount = 0;
+            totalAlerts = 0;
+            activeAlerts = [];
+            
+            // Mettre à jour l'affichage
+            Object.values(charts).forEach(chart => {
+                chart.data.labels = [];
+                chart.data.datasets.forEach(dataset => dataset.data = []);
+                chart.update();
+            });
+            
+            document.getElementById('vitalsCount').textContent = '0';
+            document.getElementById('totalAlerts').textContent = '0';
+            document.getElementById('heartRate').textContent = '--';
+            document.getElementById('bloodPressure').textContent = '--/--';
+            document.getElementById('oxygenSat').textContent = '--';
+            document.getElementById('temperature').textContent = '--';
+            document.getElementById('timestamp').textContent = getCurrentDateTime();
+            
+            updateAlertsDisplay();
+            
+            // Retirer les alertes visuelles des cartes
+            Object.values(vitalCardMap).forEach(cardId => {
+                document.getElementById(cardId).classList.remove('alert');
+            });
+            
+            console.log('🗑️ Toutes les données ont été effacées');
         }
 
-        // Initialisation au chargement de la page
+        // Initialisation au chargement
         window.onload = () => {
-            initChart();
-            console.log('📊 Application ECG Monitor initialisée');
+            initCharts();
+            // Initialiser l'heure actuelle
+            updateCurrentTime();
+            // Mettre à jour l'heure toutes les secondes
+            setInterval(updateCurrentTime, 1000);
+            console.log('📊 Medical Monitor avec système d\'alertes initialisé');
+            console.log('💡 Prêt à recevoir des données et alertes');
+        };
+
+        // Nettoyage à la fermeture
+        window.onbeforeunload = () => {
+            if (ws) {
+                ws.close();
+            }
         };
     </script>
 </body>
