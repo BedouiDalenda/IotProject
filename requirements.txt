@@ -1,0 +1,23 @@
+# installation de Mosquitto avec docker ou par "exe"
+1/docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto 
+
+# installation de protocole MQTT
+2/pip install paho-mqtt pandas
+ 
+# installation des packages
+3/ npm install mqtt express ws après ceci (cd ecg-microservice , npm init -y)
+
+
+📤 Publisher (publisher.py)
+       ↓
+   [envoie sur topic "ecg/data"]
+       ↓
+🏢 MQTT Broker (Mosquitto) ← Le "facteur" qui distribue les messages
+       ↓
+   [distribue aux abonnés]
+       ↓
+📥 Subscriber (microservice )
+       ↓
+🎧 Listener (fonction on_message)
+       ↓
+   [traite et envoie au frontend]
