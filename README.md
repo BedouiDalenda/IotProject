@@ -3,6 +3,7 @@ Système de surveillance médicale en temps réel basé sur MQTT pour la communi
 Projet académique pour comprendre l'architecture Publish/Subscribe avec MQTT.
 
 📦 Installation :
+
 1️⃣ Installer Mosquitto (Broker MQTT)
 Option A : Docker
 bashdocker run -d -p 1883:1883 -p 9001:9001 eclipse-mosquitto
@@ -22,6 +23,7 @@ npm install mqtt express ws
 
 ▶️ Utilisation
 Étape 1 : Démarrer le Broker MQTT
+
 bash # Si Docker
 docker start <container_id>
 
@@ -32,6 +34,7 @@ mosquitto -c mosquitto.conf
 bashpython generate_medical_data.py
 
 ✅ Crée medical_data_realistic.csv
+
 Étape 3 : Lancer le microservice d'alertes
 bashcd alerte-microservice
 python alert_service.py
