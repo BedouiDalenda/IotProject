@@ -6,7 +6,9 @@ Projet académique pour comprendre l'architecture Publish/Subscribe avec MQTT.
 
 1️⃣ Installer Mosquitto (Broker MQTT)
 Option A : Docker
-bashdocker run -d -p 1883:1883 -p 9001:9001 eclipse-mosquitto
+
+bash # docker run -d -p 1883:1883 -p 9001:9001 eclipse-mosquitto
+
 Option B : Installation locale
 
 Windows : Télécharger
@@ -14,34 +16,40 @@ Linux : sudo apt-get install mosquitto
 Mac : brew install mosquitto
 
 2️⃣ Installer les dépendances Python
-bashpip install -r requirements.txt
+bash # pip install -r requirements.txt
 
 3️⃣ Installer les dépendances Node.js
-bashcd ecg-microservice
+bash # cd ecg-microservice
+
 npm init -y
+
 npm install mqtt express ws
 
 ▶️ Utilisation
 Étape 1 : Démarrer le Broker MQTT
 
 bash # Si Docker
+
 docker start <container_id>
 
 bash # Si local
+
 mosquitto -c mosquitto.conf
 
 Étape 2 : Générer les données médicales
-bashpython generate_medical_data.py
+bash # python generate_medical_data.py
 
 ✅ Crée medical_data_realistic.csv
 
 Étape 3 : Lancer le microservice d'alertes
-bashcd alerte-microservice
+
+bash # cd alerte-microservice
+
 python alert_service.py
 🚨 En écoute sur medical/vitals, publie sur medical/alerts
 
 Étape 4 : Lancer le serveur WebSocket
-bashcd ecg-microservice
+bash # cd ecg-microservice
 node server.js
 🌐 WebSocket : ws://localhost:3000
 
@@ -49,5 +57,5 @@ node server.js
 Ouvrir index.html dans un navigateur
 
 Étape 6 : Publier les données
-bashcd publisher
+bash # cd publisher
 python publisher.py
