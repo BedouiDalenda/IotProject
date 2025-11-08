@@ -39,10 +39,10 @@ npm install mqtt express ws
 
 ▶️ Utilisation
 Étape 1 : Démarrer le Broker MQTT
-# Si Docker
+bash # Si Docker
 docker start <container_id>
 
-# Si local
+bash # Si local
 mosquitto -c mosquitto.conf
 
 Étape 2 : Générer les données médicales
