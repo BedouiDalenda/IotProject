@@ -2,7 +2,7 @@
 Système de surveillance médicale en temps réel basé sur MQTT pour la communication entre microservices. Surveille les signes vitaux (fréquence cardiaque, pression artérielle, saturation O₂, température) avec détection automatique d'anomalies et alertes.
 Projet académique pour comprendre l'architecture Publish/Subscribe avec MQTT.
 
-📦 Installation
+📦 Installation :
 1️⃣ Installer Mosquitto (Broker MQTT)
 Option A : Docker
 bashdocker run -d -p 1883:1883 -p 9001:9001 eclipse-mosquitto
